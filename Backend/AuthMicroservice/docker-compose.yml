@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf:ro"
+    depends_on:
+      - auth-service
+    networks:
+      - backend
+
+  auth-service:
+    build: ../auth-service
+    environment:
+      - DB_HOST=auth-postgres
+      - DB_PORT=5432
+      - DB_NAME=auth
+      - DB_USER=auth_user
+      - DB_PASSWORD=root-auth
+      - JWT_SECRET=38f7551a1a85b7a972e2ee953e442922171f16b46de446bed5386601be1c1b5574fd4d9ba39953eb4505f2a24b3e5d38672569ceb20dbd3ee8986e681e96a2d0
+    depends_on:
+      - auth-postgres
+    networks:
+      - backend
+      # порт 8081 не публикуем наружу, он будет доступен только внутри сети backend
+      # снаружи всё ходит через Gateway
+  auth-postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=auth
+      - POSTGRES_USER=auth_user
+      - POSTGRES_PASSWORD=root-auth
+    volumes:
+      - auth_pg_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  # Эти парни не реализованы - раскомментироваить по мере продвижения
+  # stt-service:
+  #   build: ../stt-service
+  #   networks:
+  #     - backend
+
+  # tts-service:
+  #   build: ../tts-service
+  #   networks:
+  #     - backend
+
+  # data-service:
+  #   build: ../data-service
+  #   networks:
+  #     - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  auth_pg_data:

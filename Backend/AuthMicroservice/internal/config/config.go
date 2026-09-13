@@ -1,14 +1,16 @@
 package config
 
 import (
-	_ "github.com/joho/godotenv/autoload"
 	"os"
 	"strings"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 type Config struct {
 	Port           string
 	AllowedOrigins []string
+	JWT_SECRET     string
 }
 
 // Load читает конфиг из env
@@ -23,8 +25,14 @@ func Load() Config {
 		port = "8080"
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		panic("JWT_SECRET is not set in environment variables")
+	}
+
 	return Config{
 		Port:           port,
 		AllowedOrigins: strings.Split(origins, ","),
+		JWT_SECRET:     jwtSecret,
 	}
 }
