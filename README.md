@@ -3,6 +3,7 @@
 Проект состоит из двух сервисов:
 
 | **Backend** (`Backend/AuthMicroservice`) | Go 1.25, chi | PORT: 8080 |
+
 | **Frontend** (`Frontend/AuthFront`) | React 19, Vite 8, TypeScript, Tailwind CSS | PORT: 5173 |
 
 ---
